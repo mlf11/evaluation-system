@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机评价生成器</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center}.container{background:white;border-radius:20px;padding:30px;width:100%;max-width:500px}.btn{display:block;width:100%;padding:15px;border:none;border-radius:10px;font-size:16px;margin:10px 0;cursor:pointer}.btn-primary{background:#4CAF50;color:white}.evaluation-card{background:#f8f9fa;border-radius:10px;padding:20px;margin:20px 0}</style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align:center;margin-bottom:20px;">🏪 您的店铺</h1>
+        
+        <div class="evaluation-card">
+            <div style="color:#666;font-size:14px;margin-bottom:5px;" id="evaluationType">随机评价</div>
+            <div style="font-size:16px;line-height:1.6;min-height:60px;" id="evaluationText">加载中...</div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="copyText()">📋 复制评价</button>
+        <button class="btn" onclick="getNew()" style="background:#f1f3f4;">🔄 换一条</button>
+        
+        <div style="background:#e8f5e9;border-radius:10px;padding:15px;margin:20px 0;text-align:center;">
+            <div>🏬 店铺链接：</div>
+            <div style="color:#4CAF50;font-weight:bold;margin:10px 0;word-break:break-all;" id="shopLink">http://dpurl.cn/5qVIrGWz</div>
+            <button class="btn btn-primary" onclick="openShop()">🚀 打开店铺</button>
+        </div>
+    </div>
+    
+    <script>
+        // 配置
+        const shopLink = "http://dpurl.cn/5qVIrGWz";
+        const evaluations = [
+            {type:"服务",text:"服务态度很好，非常满意！"},
+            {type:"专业",text:"很专业，问题解决得很到位。"},
+            {type:"速度",text:"响应速度快，效率高。"},
+            {type:"价格",text:"价格合理，性价比高。"},
+            {type:"效果",text:"效果明显，值得推荐。"}
+        ];
+        
+        let currentIndex = -1;
+        const usedIds = JSON.parse(localStorage.getItem('usedIds') || '[]');
+        
+        // 显示评价
+        function showEvaluation() {
+            const available = evaluations.filter((_, i) => !usedIds.includes(i));
+            if (available.length === 0) {
+                document.getElementById('evaluationText').textContent = "所有评价已使用！";
+                return;
+            }
+            
+            let newIndex;
+            do { newIndex = Math.floor(Math.random() * evaluations.length); }
+            while (usedIds.includes(newIndex) && usedIds.length < evaluations.length);
+            
+            currentIndex = newIndex;
+            document.getElementById('evaluationText').textContent = evaluations[currentIndex].text;
+            document.getElementById('evaluationType').textContent = evaluations[currentIndex].type;
+        }
+        
+        // 复制
+        function copyText() {
+            const text = document.getElementById('evaluationText').textContent;
+            navigator.clipboard.writeText(text).then(() => alert('✅ 已复制！'));
+        }
+        
+        // 换一条
+        function getNew() { showEvaluation(); }
+        
+        // 标记已使用
+        function markUsed() {
+            if (!usedIds.includes(currentIndex)) {
+                usedIds.push(currentIndex);
+                localStorage.setItem('usedIds', JSON.stringify(usedIds));
+                alert('🗑️ 已标记为已使用');
+                showEvaluation();
+            }
+        }
+        
+        // 打开店铺
+        function openShop() { window.open(shopLink, '_blank'); }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', showEvaluation);
+    </script>
+</body>
+</html>
